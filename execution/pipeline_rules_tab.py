@@ -31,7 +31,6 @@ import google_sheets as gs  # noqa: E402
 CONFIG = Path(__file__).resolve().parent.parent / "config" / "characters.json"
 MASTER_DB_ID = json.loads(CONFIG.read_text())["workspace"]["master_db_id"]
 TAB = "Pipeline Rules"
-INDEX = 7  # directly after Research Rules
 
 NCOLS = 9
 HEADERS = ["ID", "KIND", "NAME", "WHO", "GATE",
@@ -306,8 +305,14 @@ def main():
         svc.spreadsheets().batchUpdate(spreadsheetId=MASTER_DB_ID, body={
             "requests": [{"deleteSheet": {"sheetId": ex[TAB]}}]}).execute()
 
+    # Append after whatever tabs already exist, rather than a hardcoded index —
+    # a fresh Master DB with only "Database" doesn't have the same tab layout
+    # this script's original spreadsheet did, and a fixed index fails with
+    # "index too high" as soon as the spreadsheet has fewer tabs than that.
+    index = len(info["sheets"]) - (1 if TAB in ex else 0)
+
     res = svc.spreadsheets().batchUpdate(spreadsheetId=MASTER_DB_ID, body={"requests": [
-        {"addSheet": {"properties": {"title": TAB, "index": INDEX, "gridProperties": {
+        {"addSheet": {"properties": {"title": TAB, "index": index, "gridProperties": {
             "rowCount": len(rows) + 120, "columnCount": NCOLS,
             "frozenRowCount": 1}}}}]}).execute()
     gid = res["replies"][0]["addSheet"]["properties"]["sheetId"]

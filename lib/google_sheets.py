@@ -13,6 +13,17 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+# Windows consoles default stdout/stderr to the system codepage (e.g. cp1252),
+# which raises UnicodeEncodeError on characters like "✅"/"·"/"→" instead of
+# printing them — every execution script's own success/summary prints use
+# those. Every one of them imports this module, so fixing it here once covers
+# all of them instead of repeating the same reconfigure call 13 times.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except AttributeError:
+        pass
+
 # Scopes - need both drive and sheets access (read + write)
 SCOPES = [
     'https://www.googleapis.com/auth/drive',  # Full drive access for creating files

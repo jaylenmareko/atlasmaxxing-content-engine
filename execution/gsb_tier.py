@@ -24,6 +24,16 @@ import re
 import sys
 from pathlib import Path
 
+# Windows consoles default stdout/stderr to the system codepage (e.g. cp1252),
+# which raises UnicodeEncodeError on non-ASCII output characters. The only
+# script here with no Google Sheets import (see lib/google_sheets.py for why
+# the other 12 don't need this repeated) — pure local CSV tiering, no auth.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except AttributeError:
+        pass
+
 
 def parse_number(s: str) -> float | None:
     if s is None:

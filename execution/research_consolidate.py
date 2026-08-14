@@ -188,8 +188,13 @@ def main():
             "requests": [{"deleteSheet": {"sheetId": existing[TAB]}}]}).execute()
 
     n = len(built)
+    # Append after whatever tabs already exist, rather than a hardcoded index
+    # — a fresh Master DB with only "Database" doesn't have the same tab
+    # layout this script's original spreadsheet did, and a fixed index fails
+    # with "index too high" as soon as the spreadsheet has fewer tabs than that.
+    index = len(info["sheets"]) - (1 if TAB in existing else 0)
     r = svc.spreadsheets().batchUpdate(spreadsheetId=MASTER_DB_ID, body={"requests": [
-        {"addSheet": {"properties": {"title": TAB, "index": 7, "gridProperties": {
+        {"addSheet": {"properties": {"title": TAB, "index": index, "gridProperties": {
             "rowCount": n + 20, "columnCount": ncols, "frozenRowCount": 2}}}}]}).execute()
     gid = r["replies"][0]["addSheet"]["properties"]["sheetId"]
 
