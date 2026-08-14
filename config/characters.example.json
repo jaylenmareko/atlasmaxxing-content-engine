@@ -1,0 +1,31 @@
+{
+  "_comment": "Copy to characters.json and fill in. slug -> canvas location. This is the ONLY pointer to real data in the repo, and it holds pointers only — no character values. The values live in the canvas sheet. characters.json is gitignored.",
+
+  "workspace": {
+    "_comment": "Brand-level pointers. Research is workspace-scoped, not character-scoped.",
+    "master_db_id": "PASTE_YOUR_SPREADSHEET_ID",
+    "drive_root_id": "PASTE_YOUR_DRIVE_FOLDER_ID",
+    "research_folder": "Format Research",
+    "research_tab_prefix": "R: "
+  },
+
+  "characters": {
+    "example": {
+      "_comment": "Rename this key to your character's slug. 'tab' is the canvas tab in the spreadsheet — create it before running character_assets.py.",
+      "display": "Example Character",
+      "spreadsheet_id": "PASTE_YOUR_SPREADSHEET_ID",
+      "tab": "Example Canvas",
+      "scripts_tab": "Example Scripts",
+      "reference_tab": "Format Research",
+
+      "_comment_assets": "Written by execution/character_assets.py — it uploads the file to Drive, makes it link-readable, and drops an =IMAGE() into the cell. You do not hand-write these; the script fills them in.",
+      "assets": {},
+
+      "_comment_strips": "Wardrobe and environment strips. Same story: the script writes these.",
+      "strips": {},
+
+      "_comment_products": "Product shots, if this is a product account. Empty is fine for a growth account.",
+      "products": {}
+    }
+  }
+}

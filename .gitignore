@@ -1,0 +1,18 @@
+# ── Secrets. Never commit these. ─────────────────────────────────────────
+credentials.json
+token.json
+token_sheets.json
+.env
+ig_cookies.txt
+
+# ── Your data. The examples are tracked; the real ones are not. ──────────
+config/engine.json
+config/characters.json
+
+# ── Working files ────────────────────────────────────────────────────────
+.tmp/
+*.pyc
+__pycache__/
+.venv/
+venv/
+.DS_Store

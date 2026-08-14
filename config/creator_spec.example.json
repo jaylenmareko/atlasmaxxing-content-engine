@@ -1,0 +1,74 @@
+{
+  "_comment": "Input for: python3 execution/creator_tabs.py --spec config/creator_spec.json. Scaffolds the CANVAS + SCRIPTS tab pair for one character, matching canvas/layout.md. Copy, rename, edit — nothing here is read at runtime by anything else.",
+
+  "slug": "example",
+  "display": "Example Character",
+  "canvas_tab": "Example Canvas",
+  "scripts_tab": "Example Scripts",
+  "subtitle": "one line on who this character is and what the account is for",
+
+  "sections": [
+    {
+      "banner": "IDENTITY",
+      "kind": "slots",
+      "labels": ["Face Lock", "Face Lock — alt", "Body Lock", "Body Lock — alt"],
+      "height": 150
+    },
+    {
+      "banner": "ACCOUNT & LINKS",
+      "kind": "table",
+      "headers": ["Platform", "Handle", "Page URL"],
+      "rows": [
+        ["TikTok", "@yourhandle", "https://..."],
+        ["Instagram", "@yourhandle", "https://..."]
+      ]
+    },
+    {
+      "banner": "LINKS",
+      "kind": "table",
+      "headers": ["Product Image", "Product", "Placement", "Short Link", "Full Link"],
+      "rows": [
+        ["", "Product name", "bio", "", ""],
+        ["", "Product name", "comment", "", ""],
+        ["", "Product name", "on-screen", "", ""]
+      ]
+    },
+    {
+      "banner": "HASHTAG RULES",
+      "kind": "table",
+      "headers": ["Post Type", "Hashtags", "Rule"],
+      "rows": [
+        ["growth", "", "why these, when to change them"],
+        ["product", "", ""]
+      ]
+    },
+    {
+      "banner": "WARDROBE",
+      "kind": "slots",
+      "labels": ["outfit 1", "outfit 2", "outfit 3"],
+      "height": 150
+    },
+    {
+      "banner": "ENVIRONMENTS",
+      "kind": "slots",
+      "labels": ["environment 1", "environment 2", "environment 3"],
+      "height": 150
+    }
+  ],
+
+  "_comment_templates": "The SCRIPTS tab's TEMPLATES region. Header-driven — add columns by widening the headers array. Row 0 of each entry is its id.",
+  "hook_headers": ["ID", "Hook", "When to use"],
+  "hooks": [
+    ["H01", "", ""],
+    ["H02", "", ""]
+  ],
+  "cta_headers": ["ID", "CTA", "Keyword", "Fulfilment"],
+  "ctas": [
+    ["C01", "", "", ""],
+    ["C02", "", "", ""]
+  ],
+
+  "_comment_index": "Where the tabs sit in the spreadsheet's tab order (0-based).",
+  "canvas_index": 2,
+  "scripts_index": 3
+}

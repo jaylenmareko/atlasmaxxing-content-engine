@@ -1,0 +1,39 @@
+{
+  "_comment": "Copy to engine.json and fill in. Brand-level wiring: what you're making, where it files. engine.json is gitignored — it is yours, not the template's.",
+
+  "brand_name": "YOUR BRAND",
+
+  "_comment_creators": "One brand, N creators. 'folder' is the local working folder where video folders live. 'drive_subpath' is the chain under the Brands folder in Drive.",
+  "creators": {
+    "example": {
+      "display": "Example Creator",
+      "folder": "~/Desktop/Example Creator",
+      "captions_tab": "Example Captions",
+      "drive_subpath": ["YOUR BRAND"]
+    }
+  },
+  "default_creator": "example",
+
+  "_comment_db": "The spreadsheet that holds your reference-video Database tab. Create it, then paste its id from the URL: docs.google.com/spreadsheets/d/<THIS PART>/edit",
+  "master_db_id": "PASTE_YOUR_SPREADSHEET_ID",
+  "master_db_tab": "Database",
+
+  "_comment_columns": "0-based column indexes into the Database tab. Defaults match the slim schema: A=Thumbnail B=Link C=Brand D=Platform E=Transcript F=Type G=Creator, H+ = storyboard frames.",
+  "columns": {
+    "link": 1,
+    "transcript": 4,
+    "type": 5,
+    "style": null,
+    "creator": 6
+  },
+
+  "_comment_captions": "Leave captions_sheet_id null to use the master DB spreadsheet.",
+  "captions_sheet_id": null,
+  "captions_tab": "Captions",
+
+  "_comment_drive": "drive_root_id is the Drive folder everything is created under — open the folder and copy the id from the URL. drive_path is the folder chain for working docs; {year} and {month} are filled at run time.",
+  "drive_root_id": "PASTE_YOUR_DRIVE_FOLDER_ID",
+  "drive_path": ["{year}", "Scripts", "{month}"],
+  "pool_folder_name": "Video Pool",
+  "brands_folder_name": "Brands"
+}

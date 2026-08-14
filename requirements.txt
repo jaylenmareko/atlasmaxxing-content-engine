@@ -1,0 +1,15 @@
+# Google APIs — Sheets, Drive, Docs
+google-api-python-client>=2.100
+google-auth>=2.23
+google-auth-oauthlib>=1.1
+google-auth-httplib2>=0.1.1
+
+# HTTP — used by the Gemini passes in lib/gemini_pass.py and execution/clip_map.py
+requests>=2.31
+
+# .env loading for GEMINI_API_KEY
+python-dotenv>=1.0
+
+# Optional — only execution/research_assets.py, and only when it transcribes locally.
+# Install if you want local transcription; skip otherwise.
+# openai-whisper>=20231117
