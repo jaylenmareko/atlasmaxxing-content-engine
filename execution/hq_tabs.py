@@ -218,7 +218,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
-    spec = json.loads(Path(a.spec).read_text())
+    spec = json.loads(Path(a.spec).read_text(encoding="utf-8"))
     svc = gs.get_sheets_service()
     ss = spec["master_db_id"]
 

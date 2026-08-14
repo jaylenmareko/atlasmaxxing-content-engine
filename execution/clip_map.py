@@ -146,7 +146,7 @@ Return ONLY a JSON array of exactly {n} objects, one per image, in the same orde
 # ── data in ────────────────────────────────────────────────────────────────────
 
 def load_character(slug: str) -> dict:
-    chars = json.loads(CHARACTERS.read_text())["characters"]
+    chars = json.loads(CHARACTERS.read_text(encoding="utf-8"))["characters"]
     if slug not in chars:
         raise KeyError(f"Unknown character {slug!r}. Known: {', '.join(chars) or '(none)'}")
     return chars[slug]
@@ -252,7 +252,7 @@ def extract_and_register(row: int, video: Path, missed: list[dict],
             fields="files(id)").execute().get("files", [])
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / "manifest.json"
-            p.write_text(json.dumps(manifest, indent=2))
+            p.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
             du.upload_file(str(p), "manifest.json", folder, "application/json")
         for f in old:
             drive.files().delete(fileId=f["id"]).execute()

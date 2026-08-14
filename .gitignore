@@ -8,6 +8,7 @@ ig_cookies.txt
 # ── Your data. The examples are tracked; the real ones are not. ──────────
 config/engine.json
 config/characters.json
+config/creator_spec.json
 
 # ── Working files ────────────────────────────────────────────────────────
 .tmp/

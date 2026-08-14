@@ -532,7 +532,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
-    cfg = json.loads(CONFIG.read_text())
+    cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
     ssid = cfg["workspace"]["master_db_id"]
 
     rows, banners, heights = build()

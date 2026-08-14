@@ -31,7 +31,7 @@ import sys
 from pathlib import Path
 
 CONFIG = Path(__file__).resolve().parent.parent / "config" / "characters.json"
-WS = json.loads(CONFIG.read_text())["workspace"]
+WS = json.loads(CONFIG.read_text(encoding="utf-8"))["workspace"]
 MASTER_DB_ID = WS["master_db_id"]
 TAB = "Format Research"
 
@@ -165,10 +165,10 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
-    rows = json.loads(a.map.read_text())["rows"]
-    frames = json.loads(a.frames.read_text()) if a.frames else {}
-    mech = json.loads(a.mechanism.read_text()) if a.mechanism else {}
-    finds = json.loads(a.findings.read_text()) if a.findings else {}
+    rows = json.loads(a.map.read_text(encoding="utf-8"))["rows"]
+    frames = json.loads(a.frames.read_text(encoding="utf-8")) if a.frames else {}
+    mech = json.loads(a.mechanism.read_text(encoding="utf-8")) if a.mechanism else {}
+    finds = json.loads(a.findings.read_text(encoding="utf-8")) if a.findings else {}
 
     built, n_data, ncols, max_f, marks = build(rows, frames, mech, finds)
     counts = {k: sum(1 for r in rows if r["fmt"] == k) for k in ORDER}

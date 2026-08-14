@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 import google_sheets as gs  # noqa: E402
 
 CONFIG = Path(__file__).resolve().parent.parent / "config" / "characters.json"
-MASTER_DB_ID = json.loads(CONFIG.read_text())["workspace"]["master_db_id"]
+MASTER_DB_ID = json.loads(CONFIG.read_text(encoding="utf-8"))["workspace"]["master_db_id"]
 TAB = "Pipeline Rules"
 
 NCOLS = 9

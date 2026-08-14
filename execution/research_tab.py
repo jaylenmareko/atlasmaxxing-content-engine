@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 
 CONFIG = Path(__file__).resolve().parent.parent / "config" / "characters.json"
-WS = json.loads(CONFIG.read_text())["workspace"]
+WS = json.loads(CONFIG.read_text(encoding="utf-8"))["workspace"]
 MASTER_DB_ID = WS["master_db_id"]
 TAB_PREFIX = WS.get("research_tab_prefix", "R: ")
 

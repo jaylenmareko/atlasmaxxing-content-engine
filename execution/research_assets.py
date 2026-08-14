@@ -33,7 +33,7 @@ from pathlib import Path
 
 ENGINE_EXEC = Path(__file__).resolve().parent
 CONFIG = ENGINE_EXEC.parent / "config" / "characters.json"
-WS = json.loads(CONFIG.read_text())["workspace"]
+WS = json.loads(CONFIG.read_text(encoding="utf-8"))["workspace"]
 MASTER_DB_ID = WS["master_db_id"]
 DRIVE_ROOT_ID = WS["drive_root_id"]
 RESEARCH_FOLDER = WS.get("research_folder", "Format Research")

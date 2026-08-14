@@ -17,6 +17,7 @@ Drive tree (created on demand, character-agnostic):
 
 Usage:
   python3 character_assets.py --character example --slot face_lock --file path/to.jpg
+  python3 character_assets.py --character example --strip wardrobe --label "Grey Hoodie" --file path/to.jpg
   python3 character_assets.py --character example --list
 """
 
@@ -67,11 +68,11 @@ def col_letter(i: int) -> str:
 
 
 def load_characters() -> dict:
-    return json.loads(CHARACTERS.read_text())
+    return json.loads(CHARACTERS.read_text(encoding="utf-8"))
 
 
 def save_characters(data: dict) -> None:
-    CHARACTERS.write_text(json.dumps(data, indent=2) + "\n")
+    CHARACTERS.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
 def find_banner(char: dict, banner: str) -> tuple[int, int]:
@@ -152,6 +153,54 @@ def place(slug: str, slot: str, local: Path) -> dict:
     return {"slot": slot, "cell": cell, "file_id": fid, "drive_folder": folder_id}
 
 
+def place_strip_item(slug: str, strip: str, local: Path, label: str) -> dict:
+    """Upload ONE local image directly into the next open column of a wardrobe/
+    environment strip. Companion to fill_strip() below, which instead copies
+    images already on Drive (bulk case) — this is for the common onboarding
+    case: a brand-new character with nothing on Drive yet, filling one
+    named slot at a time from local reference photos. Was previously only
+    reachable by importing this module and calling it directly — no CLI path
+    existed despite fill_strip() being fully wired into --list's output.
+    """
+    if strip not in STRIPS:
+        raise KeyError(f"Unknown strip {strip!r}. Known: {', '.join(STRIPS)}")
+    if not local.exists():
+        raise FileNotFoundError(local)
+
+    data = load_characters()
+    char = data["characters"][slug]
+    banner, subfolder = STRIPS[strip]
+    banner_r, banner_c = find_banner(char, banner)
+    existing = char.get("strips", {}).get(strip, [])
+    col = banner_c + len(existing)
+    row = banner_r + 2
+    display = char.get("display") or slug.title()
+
+    drive = du.get_drive_service()
+    folder_id = assets_folder(drive, display, subfolder)
+    n = len(existing) + 1
+    name = f"{slug}_{strip}_{n:02d}_{label}{local.suffix.lower()}"
+    meta = du.upload_public(local, name, folder_id, MIME.get(local.suffix.lower(), "image/jpeg"))
+    if not meta:
+        raise RuntimeError(f"upload failed for {local}")
+    fid = meta["id"]
+
+    cell_col = col_letter(col)
+    svc = get_sheets_service()
+    svc.spreadsheets().values().batchUpdate(
+        spreadsheetId=char["spreadsheet_id"],
+        body={"valueInputOption": "USER_ENTERED", "data": [
+            {"range": f"'{char['tab']}'!{cell_col}{row}", "values": [[image_formula(fid)]]},
+            {"range": f"'{char['tab']}'!{cell_col}{row - 1}", "values": [[label]]},
+        ]}).execute()
+
+    placed = {"cell": f"{cell_col}{row}", "file_id": fid, "label": label, "source": local.name}
+    char.setdefault("strips", {}).setdefault(strip, [])
+    char["strips"][strip].append(placed)
+    save_characters(data)
+    return placed
+
+
 def fill_strip(slug: str, strip: str, items: list[dict], start: int = 0) -> list[dict]:
     """Populate a header strip from images ALREADY on Drive.
 
@@ -210,6 +259,8 @@ def main():
     ap = argparse.ArgumentParser(description="Upload a character reference image into its canvas cell")
     ap.add_argument("--character", required=True, help="slug from config/characters.json")
     ap.add_argument("--slot", choices=list(SLOTS))
+    ap.add_argument("--strip", choices=list(STRIPS), help="append one local image to a wardrobe/environment strip")
+    ap.add_argument("--label", help="name for this strip entry (required with --strip)")
     ap.add_argument("--file")
     ap.add_argument("--list", action="store_true", help="show what is already placed")
     args = ap.parse_args()
@@ -228,9 +279,14 @@ def main():
                   f"{', '.join(p['label'] for p in placed) or '—'}")
         return
 
-    if not (args.slot and args.file):
-        ap.error("--slot and --file are required unless --list")
-    print(json.dumps(place(args.character, args.slot, Path(args.file)), indent=2))
+    if args.slot and args.file:
+        print(json.dumps(place(args.character, args.slot, Path(args.file)), indent=2))
+    elif args.strip and args.file:
+        if not args.label:
+            ap.error("--label is required with --strip")
+        print(json.dumps(place_strip_item(args.character, args.strip, Path(args.file), args.label), indent=2))
+    else:
+        ap.error("--slot+--file, or --strip+--label+--file, are required unless --list")
 
 
 if __name__ == "__main__":

@@ -176,13 +176,13 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
-    chars = json.loads(CONFIG.read_text())["characters"]
+    chars = json.loads(CONFIG.read_text(encoding="utf-8"))["characters"]
     if a.character not in chars:
         raise KeyError(f"Unknown character {a.character!r}. Known: {', '.join(chars) or '(none)'}")
     ch = chars[a.character]
     tab = ch.get("scripts_tab", f"{a.character.title()} Scripts")
     add_block(ch["spreadsheet_id"], tab, dry_run=a.dry_run,
-              **json.loads(Path(a.payload).read_text()))
+              **json.loads(Path(a.payload).read_text(encoding="utf-8")))
 
 
 if __name__ == "__main__":

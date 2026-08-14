@@ -39,7 +39,7 @@ import google_sheets as gs  # noqa: E402
 # the rules have to be visible and editable in the same file as the work. The old
 # SCRIPTING MATRIX -> LIBRARY tab is a superseded copy; do not read it.
 CONFIG = Path(__file__).resolve().parent.parent / "config" / "characters.json"
-MATRIX_ID = json.loads(CONFIG.read_text())["workspace"]["master_db_id"]
+MATRIX_ID = json.loads(CONFIG.read_text(encoding="utf-8"))["workspace"]["master_db_id"]
 LIBRARY_TAB = "Script Rules"
 
 # Style weights delivery, not words. A route is demoted, never dropped.

@@ -20,7 +20,7 @@ if not CONFIG_PATH.exists():
         f"Copy config/engine.example.json to config/engine.json and fill it in — see SETUP.md."
     )
 
-_cfg = json.loads(CONFIG_PATH.read_text())
+_cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
 
 # ── Brand ────────────────────────────────────────────────────────────────
 BRAND_NAME = _cfg["brand_name"]

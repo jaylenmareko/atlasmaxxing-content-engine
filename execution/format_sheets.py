@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 CONFIG = Path(__file__).resolve().parent.parent / "config" / "characters.json"
-WS = json.loads(CONFIG.read_text())["workspace"]
+WS = json.loads(CONFIG.read_text(encoding="utf-8"))["workspace"]
 MASTER_DB_ID = WS["master_db_id"]
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
@@ -221,10 +221,10 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
-    rows = json.loads(a.map.read_text())["rows"]
-    frames = json.loads(a.frames.read_text()) if a.frames else {}
-    mech = json.loads(a.mechanism.read_text()) if a.mechanism else {}
-    finds = json.loads(a.findings.read_text()) if a.findings else {}
+    rows = json.loads(a.map.read_text(encoding="utf-8"))["rows"]
+    frames = json.loads(a.frames.read_text(encoding="utf-8")) if a.frames else {}
+    mech = json.loads(a.mechanism.read_text(encoding="utf-8")) if a.mechanism else {}
+    finds = json.loads(a.findings.read_text(encoding="utf-8")) if a.findings else {}
     keys = [a.only] if a.only else list(FORMATS)
     svc = None if a.dry_run else gs.get_sheets_service()
 

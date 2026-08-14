@@ -39,7 +39,7 @@ import sys
 from pathlib import Path
 
 CONFIG = Path(__file__).resolve().parent.parent / "config" / "characters.json"
-WS = json.loads(CONFIG.read_text())["workspace"]
+WS = json.loads(CONFIG.read_text(encoding="utf-8"))["workspace"]
 MASTER_DB_ID = WS["master_db_id"]
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
@@ -178,7 +178,7 @@ def main():
     ap.add_argument("--replace", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
-    spec = json.loads(a.spec.read_text())
+    spec = json.loads(a.spec.read_text(encoding="utf-8"))
 
     cr, ch, cm = build_canvas(spec)
     sr, sh, sm = build_scripts(spec)
