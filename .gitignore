@@ -17,3 +17,6 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# Working outputs — real generated images/data, not template content
+artifacts/
