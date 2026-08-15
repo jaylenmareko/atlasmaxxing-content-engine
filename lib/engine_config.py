@@ -10,6 +10,16 @@ from pathlib import Path
 import json
 import sys
 
+# Windows consoles default stdout/stderr to the system codepage (e.g. cp1252),
+# which raises UnicodeEncodeError on the emoji these scripts print (📁, ✅, ⚠️).
+# lib/google_sheets.py carries the same fix for the Sheets path; this covers
+# the Drive path, since drive_utils.py imports this module but not that one.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except AttributeError:
+        pass
+
 ENGINE_ROOT = Path(__file__).resolve().parent.parent
 LIB = ENGINE_ROOT / "lib"
 CONFIG_PATH = ENGINE_ROOT / "config" / "engine.json"
