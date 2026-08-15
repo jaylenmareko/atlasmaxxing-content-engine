@@ -316,7 +316,7 @@ def label_frames(frames: list[dict], v_folder: Path) -> list[dict]:
     for attempt in range(4):
         r = requests.post(
             "https://generativelanguage.googleapis.com/v1beta/models/"
-            f"gemini-flash-latest:generateContent?key={key}",
+            f"gemini-flash-lite-latest:generateContent?key={key}",
             json={"contents": [{"parts": parts}],
                   "generationConfig": {"temperature": 0.1, "maxOutputTokens": 8192}},
             timeout=300)

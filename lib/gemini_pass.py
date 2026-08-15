@@ -32,9 +32,13 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # "gemini-2.5-flash" (the original pinned version) returns 404 "no longer
 # available to new users" as of 2026-08 — confirmed live against this key.
-# The "-latest" alias tracks whatever Google currently recommends instead of
-# pinning a version that will eventually suffer the same fate.
-MODEL = "gemini-flash-latest"
+# "gemini-flash-latest" (the non-lite alias) is accepted but was hitting
+# sustained 503 "high demand" — 4/4 retries failed live. "-lite" answered
+# cleanly on the first try. Worth revisiting if demand eases or output
+# quality on the labeling/transcription tasks turns out to need the
+# heavier model — this was a "what actually works right now" call, not a
+# permanent judgment that lite is the better choice long-term.
+MODEL = "gemini-flash-lite-latest"
 
 PROMPT = """You are a viral short-form video analyst. Watch this video as a viewer would, then report with timestamps:
 1. VIEWER EXPERIENCE — describe the video beat by beat as it's experienced: what happens, what you notice first, where your attention spikes or drifts, the moment you'd scroll away (or why you wouldn't)
