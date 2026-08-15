@@ -35,6 +35,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 ENGINE_ROOT = Path(__file__).resolve().parent.parent
@@ -306,12 +307,28 @@ def label_frames(frames: list[dict], v_folder: Path) -> list[dict]:
                                      "data": base64.b64encode(local.read_bytes()).decode()}})
     parts.append({"text": LABEL_PROMPT.format(n=len(frames))})
 
-    r = requests.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.5-flash:generateContent?key={key}",
-        json={"contents": [{"parts": parts}],
-              "generationConfig": {"temperature": 0.1, "maxOutputTokens": 8192}},
-        timeout=300)
+    # Same model/retry fix as lib/gemini_pass.py's analyze() — this call is
+    # a separate direct request, not routed through that function, so it
+    # needed the identical fix applied a second time. See that file's MODEL
+    # comment: gemini-2.5-flash 404s for this key as of 2026-08, and 503
+    # "high demand" is common enough to need a retry, not just a raise.
+    r = None
+    for attempt in range(4):
+        r = requests.post(
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"gemini-flash-latest:generateContent?key={key}",
+            json={"contents": [{"parts": parts}],
+                  "generationConfig": {"temperature": 0.1, "maxOutputTokens": 8192}},
+            timeout=300)
+        if r.status_code == 200:
+            break
+        if r.status_code in (429, 500, 503) and attempt < 3:
+            delay = 3.0 * (2 ** attempt)
+            print(f"  ⚠️ label pass {r.status_code} — retrying in {delay:.0f}s "
+                  f"(attempt {attempt + 2}/4)", file=sys.stderr)
+            time.sleep(delay)
+            continue
+        break
     if r.status_code != 200:
         raise RuntimeError(f"label pass failed: {r.status_code} {r.text[:200]}")
     text = "".join(p.get("text", "")
