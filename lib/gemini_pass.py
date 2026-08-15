@@ -30,7 +30,11 @@ from dotenv import load_dotenv                      # noqa: E402
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-MODEL = "gemini-2.5-flash"
+# "gemini-2.5-flash" (the original pinned version) returns 404 "no longer
+# available to new users" as of 2026-08 — confirmed live against this key.
+# The "-latest" alias tracks whatever Google currently recommends instead of
+# pinning a version that will eventually suffer the same fate.
+MODEL = "gemini-flash-latest"
 
 PROMPT = """You are a viral short-form video analyst. Watch this video as a viewer would, then report with timestamps:
 1. VIEWER EXPERIENCE — describe the video beat by beat as it's experienced: what happens, what you notice first, where your attention spikes or drifts, the moment you'd scroll away (or why you wouldn't)
@@ -81,14 +85,34 @@ def upload_to_gemini(file_path: Path) -> str | None:
     return None
 
 
+MAX_ATTEMPTS = 4
+RETRY_BASE_DELAY = 3.0
+
+
 def analyze(uri: str, prompt: str = PROMPT) -> str | None:
-    r = requests.post(
-        f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={GEMINI_API_KEY}",
-        json={"contents": [{"parts": [
-                  {"fileData": {"mimeType": "video/mp4", "fileUri": uri}},
-                  {"text": prompt}]}],
-              "generationConfig": {"temperature": 0.3, "maxOutputTokens": 16384}},
-        timeout=300)
+    # 503 "high demand" is common and genuinely transient — confirmed live,
+    # 2 of 3 back-to-back calls hit it before the 3rd succeeded. clip_map.py
+    # makes several of these calls per run (transcribe, missed-shot
+    # detection, labeling, realign); with no retry, one unlucky 503 anywhere
+    # in that chain kills the whole run.
+    r = None
+    for attempt in range(MAX_ATTEMPTS):
+        r = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={GEMINI_API_KEY}",
+            json={"contents": [{"parts": [
+                      {"fileData": {"mimeType": "video/mp4", "fileUri": uri}},
+                      {"text": prompt}]}],
+                  "generationConfig": {"temperature": 0.3, "maxOutputTokens": 16384}},
+            timeout=300)
+        if r.status_code == 200:
+            break
+        if r.status_code in (429, 500, 503) and attempt < MAX_ATTEMPTS - 1:
+            delay = RETRY_BASE_DELAY * (2 ** attempt)
+            print(f"  ⚠️ generateContent {r.status_code} — retrying in {delay:.0f}s "
+                  f"(attempt {attempt + 2}/{MAX_ATTEMPTS})")
+            time.sleep(delay)
+            continue
+        break
     if r.status_code != 200:
         print(f"  ⚠️ generateContent failed: {r.status_code} {r.text[:200]}")
         return None
